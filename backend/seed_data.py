@@ -1,0 +1,248 @@
+"""
+Demo accounts and realistic sample activity for the school platform.
+
+Only fictional demo records are stored. No photos, videos or real children's
+data are used anywhere in the project.
+"""
+
+DEMO_USERS = [
+    {
+        "name": "Meera Kapoor",
+        "email": "admin@iafs.school",
+        "password": "Admin@123",
+        "role": "admin",
+        "class_level": None,
+        "section": None,
+        "roll_no": None,
+        "subjects": [],
+    },
+    {
+        "name": "Ananya Sharma",
+        "email": "teacher@iafs.school",
+        "password": "Teacher@123",
+        "role": "teacher",
+        "class_level": None,
+        "section": None,
+        "roll_no": None,
+        "subjects": ["English", "Mathematics"],
+    },
+    {
+        "name": "Aarav Mehta",
+        "email": "aarav@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 4,
+        "section": "A",
+        "roll_no": "4A-07",
+    },
+    {
+        "name": "Priya Nair",
+        "email": "priya@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 8,
+        "section": "B",
+        "roll_no": "8B-12",
+    },
+    {
+        "name": "Rohan Verma",
+        "email": "rohan@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 6,
+        "section": "A",
+        "roll_no": "6A-03",
+    },
+    {
+        "name": "Sara Khan",
+        "email": "sara@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 2,
+        "section": "A",
+        "roll_no": "2A-15",
+    },
+    {
+        "name": "Kabir Singh",
+        "email": "kabir@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 1,
+        "section": "A",
+        "roll_no": "1A-04",
+    },
+    {
+        "name": "Diya Patel",
+        "email": "diya@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 3,
+        "section": "B",
+        "roll_no": "3B-09",
+    },
+    {
+        "name": "Ishan Gupta",
+        "email": "ishan@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 5,
+        "section": "A",
+        "roll_no": "5A-11",
+    },
+    {
+        "name": "Meera Joshi",
+        "email": "meera@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 7,
+        "section": "A",
+        "roll_no": "7A-06",
+    },
+    {
+        "name": "Arjun Rao",
+        "email": "arjun@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 9,
+        "section": "B",
+        "roll_no": "9B-18",
+    },
+    {
+        "name": "Nisha Bansal",
+        "email": "nisha@iafs.school",
+        "password": "Student@123",
+        "role": "student",
+        "class_level": 10,
+        "section": "A",
+        "roll_no": "10A-02",
+    },
+]
+
+# Safe demo credentials shown on the login page.
+DEMO_ACCOUNTS = [
+    {
+        "role": "student",
+        "label": "Class 4 student",
+        "name": "Aarav Mehta",
+        "email": "aarav@iafs.school",
+        "password": "Student@123",
+    },
+    {
+        "role": "student",
+        "label": "Class 8 student",
+        "name": "Priya Nair",
+        "email": "priya@iafs.school",
+        "password": "Student@123",
+    },
+    {
+        "role": "teacher",
+        "label": "Teacher",
+        "name": "Ananya Sharma",
+        "email": "teacher@iafs.school",
+        "password": "Teacher@123",
+    },
+    {
+        "role": "admin",
+        "label": "Administrator",
+        "name": "Meera Kapoor",
+        "email": "admin@iafs.school",
+        "password": "Admin@123",
+    },
+]
+
+# (student email, topic slug, score out of 8, days ago, hour of day)
+SAMPLE_ATTEMPTS = [
+    ("aarav@iafs.school", "addition", 8, 16, 9),
+    ("aarav@iafs.school", "subtraction", 6, 14, 10),
+    ("aarav@iafs.school", "multiplication", 4, 12, 11),
+    ("aarav@iafs.school", "fractions", 3, 9, 9),
+    ("aarav@iafs.school", "alphabet-recognition", 8, 7, 10),
+    ("aarav@iafs.school", "spelling-practice", 5, 6, 15),
+    ("aarav@iafs.school", "reading-comprehension", 7, 3, 11),
+    ("aarav@iafs.school", "basic-vocabulary", 6, 1, 9),
+    ("priya@iafs.school", "algebra", 3, 18, 10),
+    ("priya@iafs.school", "linear-equations", 5, 16, 14),
+    ("priya@iafs.school", "percentages", 4, 13, 11),
+    ("priya@iafs.school", "parts-of-speech", 6, 11, 9),
+    ("priya@iafs.school", "tenses", 7, 8, 10),
+    ("priya@iafs.school", "vocabulary-building", 8, 5, 15),
+    ("priya@iafs.school", "ratio-proportion", 5, 3, 12),
+    ("priya@iafs.school", "geometry", 4, 1, 10),
+    ("rohan@iafs.school", "fractions-decimals", 3, 15, 11),
+    ("rohan@iafs.school", "geometry", 5, 12, 9),
+    ("rohan@iafs.school", "integers", 6, 10, 14),
+    ("rohan@iafs.school", "sentence-correction", 3, 7, 10),
+    ("rohan@iafs.school", "reading-comprehension-secondary", 7, 4, 9),
+    ("rohan@iafs.school", "basic-writing-skills", 5, 2, 16),
+    ("sara@iafs.school", "counting", 8, 13, 9),
+    ("sara@iafs.school", "addition", 7, 10, 10),
+    ("sara@iafs.school", "basic-shapes", 6, 7, 11),
+    ("sara@iafs.school", "basic-vocabulary", 5, 4, 9),
+    ("sara@iafs.school", "alphabet-recognition", 7, 2, 10),
+    ("kabir@iafs.school", "counting", 6, 8, 10),
+    ("kabir@iafs.school", "alphabet-recognition", 5, 5, 11),
+    ("kabir@iafs.school", "basic-shapes", 4, 2, 9),
+    ("diya@iafs.school", "naming-words", 6, 12, 9),
+    ("diya@iafs.school", "articles", 5, 9, 10),
+    ("diya@iafs.school", "addition", 7, 6, 11),
+    ("diya@iafs.school", "multiplication", 4, 3, 15),
+    ("ishan@iafs.school", "fractions", 5, 11, 10),
+    ("ishan@iafs.school", "number-patterns", 6, 8, 9),
+    ("ishan@iafs.school", "simple-sentences", 7, 5, 14),
+    ("ishan@iafs.school", "basic-grammar", 5, 2, 10),
+    ("meera@iafs.school", "integers", 4, 10, 9),
+    ("meera@iafs.school", "percentages", 5, 7, 11),
+    ("meera@iafs.school", "active-passive-voice", 6, 4, 10),
+    ("meera@iafs.school", "vocabulary-building", 7, 1, 15),
+    ("arjun@iafs.school", "linear-equations", 6, 9, 10),
+    ("arjun@iafs.school", "basic-statistics", 5, 6, 12),
+    ("arjun@iafs.school", "direct-indirect-speech", 4, 3, 9),
+    ("nisha@iafs.school", "algebra", 7, 8, 10),
+    ("nisha@iafs.school", "geometry", 6, 5, 11),
+    ("nisha@iafs.school", "tenses", 8, 2, 9),
+]
+
+# (email, role, class_level, text, minutes ago)
+SAMPLE_CHATS = [
+    ("teacher@iafs.school", "teacher", 4, "Welcome to Class 4! This week we are revising fractions and spelling. Ask your questions here.", 2900),
+    ("aarav@iafs.school", "student", 4, "I am not understanding how to compare 1/2 and 1/4. Please explain.", 1800),
+    ("teacher@iafs.school", "teacher", 4, "Good question, Aarav. Draw two equal circles, shade half of one and a quarter of the other. The half has more shaded space.", 1750),
+    ("sara@iafs.school", "student", 2, "I got 7 out of 8 in addition today. It was easy!", 1500),
+    ("teacher@iafs.school", "teacher", 8, "Class 8, remember that the angles in a triangle always add to 180 degrees.", 1400),
+    ("priya@iafs.school", "student", 8, "I am stuck on algebra. Can you explain like terms again?", 1200),
+    ("rohan@iafs.school", "student", 6, "The fraction and decimal conversion is a bit difficult.", 900),
+    ("teacher@iafs.school", "teacher", 6, "Rohan, remember 3/4 means 3 divided by 4. Try 3 divided by 4 on paper and tell me what you get.", 850),
+    ("meera@iafs.school", "student", 7, "I enjoyed the vocabulary quiz. Synonyms are easy now.", 600),
+    ("teacher@iafs.school", "teacher", None, "Well done everyone. Keep using the learning assistant when a step feels hard.", 300),
+]
+
+# (email, session_seconds, face_ratio, centered_ratio, days ago)
+SAMPLE_FOCUS = [
+    ("aarav@iafs.school", 640, 0.94, 0.81, 12),
+    ("aarav@iafs.school", 520, 0.88, 0.74, 4),
+    ("priya@iafs.school", 700, 0.91, 0.78, 9),
+    ("priya@iafs.school", 460, 0.72, 0.58, 2),
+    ("rohan@iafs.school", 380, 0.68, 0.55, 6),
+    ("sara@iafs.school", 300, 0.86, 0.79, 3),
+    ("ishan@iafs.school", 540, 0.9, 0.82, 5),
+    ("nisha@iafs.school", 820, 0.97, 0.9, 1),
+]
+
+# (student email, note, days ago)
+SAMPLE_NOTES = [
+    (
+        "aarav@iafs.school",
+        "Aarav reads confidently. He needs short, concrete fraction examples before moving to harder questions.",
+        5,
+    ),
+    (
+        "priya@iafs.school",
+        "Priya is strong in vocabulary and tenses. Plan extra algebra practice with worked examples.",
+        3,
+    ),
+    (
+        "rohan@iafs.school",
+        "Rohan benefits from visual models for fractions. Check in after the next quiz.",
+        2,
+    ),
+]
