@@ -1,9 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// The dev server proxies /api to Flask so the frontend can use relative URLs.
-// `npm run build` writes the production build into backend/static, which Flask
-// can serve directly for a single-server demo.
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -16,7 +13,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../backend/static",
+    outDir: "dist",
     emptyOutDir: true,
   },
 });
