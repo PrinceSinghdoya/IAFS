@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: iafs-backend
+    runtime: python
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "gunicorn --chdir backend app:app"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        value: iafs
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: AUTO_SEED
+        value: "true"
+      - key: TEACHER_INVITE_CODE
+        value: IAFS2026

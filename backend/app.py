@@ -38,17 +38,23 @@ def create_app():
     app.config["SECRET_KEY"] = Config.JWT_SECRET
     app.config["JSON_SORT_KEYS"] = False
 
-    CORS(
-        app,
-        resources={r"/api/*": {"origins": Config.CORS_ORIGINS}},
-        supports_credentials=True,
-    )
+    if Config.CORS_ORIGINS == "*":
+        CORS(app, resources={r"/api/*": {"origins": "*"}})
+    else:
+        CORS(
+            app,
+            resources={r"/api/*": {"origins": Config.CORS_ORIGINS}},
+            supports_credentials=True,
+        )
 
-    # Create database indexes at startup (fails gracefully if Mongo is down).
+    # Create database indexes and auto-seed if needed (fails gracefully if Mongo is down).
     try:
         init_indexes()
+        if Config.AUTO_SEED:
+            from seed import auto_seed_if_empty
+            auto_seed_if_empty(app.logger)
     except Exception as exc:  # pragma: no cover
-        app.logger.warning("Could not initialise MongoDB indexes: %s", exc)
+        app.logger.warning("Could not initialise MongoDB: %s", exc)
 
     # ------------------------------------------------------------------
     # Routes
@@ -142,5 +148,6 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    print("IAFS API running at http://127.0.0.1:5000")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"IAFS API running at http://0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port, debug=False)

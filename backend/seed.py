@@ -375,6 +375,32 @@ def seed_feedback(db):
     print(f"  [ok] adaptive feedback generated ({added} new)")
 
 
+def run_seed(db):
+    """Seed all structure, accounts and demo activity."""
+    seed_structure(db)
+    seed_users(db)
+    seed_results(db)
+    seed_chats(db)
+    seed_focus(db)
+    seed_notes(db)
+    seed_feedback(db)
+
+
+def auto_seed_if_empty(logger=None):
+    """Auto-seed when database has no users yet (useful on fresh cloud deploys)."""
+    try:
+        db = get_db()
+        if db.users.count_documents({}) == 0:
+            if logger:
+                logger.info("Database has no users. Running initial seed...")
+            run_seed(db)
+            if logger:
+                logger.info("Initial seed completed successfully.")
+    except Exception as exc:
+        if logger:
+            logger.warning("Auto-seed skipped or failed: %s", exc)
+
+
 def main():
     ok, message = ping_database()
     print(message)

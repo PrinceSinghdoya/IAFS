@@ -22,11 +22,16 @@ class Config:
     JWT_SECRET = os.getenv("JWT_SECRET", "iafs-dev-secret-change-me-in-production")
     JWT_EXPIRES_HOURS = int(os.getenv("JWT_EXPIRES_HOURS", "12"))
 
-    # Allowed frontend origins (comma separated)
-    CORS_ORIGINS = os.getenv(
-        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-    ).split(",")
+    # Allowed frontend origins (comma separated or * for wildcard)
+    _cors_env = os.getenv("CORS_ORIGINS", "*").strip()
+    if _cors_env == "*" or not _cors_env:
+        CORS_ORIGINS = "*"
+    else:
+        CORS_ORIGINS = [o.strip() for o in _cors_env.split(",") if o.strip()]
 
     # Demo teacher account is created by seed.py using this invite code.
     # Students cannot self-register as teachers.
     TEACHER_INVITE_CODE = os.getenv("TEACHER_INVITE_CODE", "IAFS2026")
+
+    # Automatically seed fresh cloud database if empty on startup
+    AUTO_SEED = os.getenv("AUTO_SEED", "true").lower() in ("true", "1", "yes")

@@ -2,7 +2,9 @@
  * Tiny fetch wrapper around the Flask API.
  * The JWT token is stored in localStorage by AuthContext.
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+// Allow VITE_API_URL to be passed with or without trailing /api or slashes.
+const rawBase = (import.meta.env.VITE_API_URL || "/api").trim().replace(/\/+$/, "");
+const API_BASE_URL = rawBase.endsWith("/api") ? rawBase : `${rawBase}/api`;
 
 export class ApiError extends Error {
   constructor(message, status = 0, data = {}) {
