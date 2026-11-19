@@ -17,7 +17,7 @@ The project is intentionally easy to explain: every score, category and recommen
 - End-of-quiz summary with score, percentage, category, topics that need practice and personalised suggestions.
 - Review every question and answer afterwards.
 - Personal **progress** and **feedback** pages generated from saved quiz results.
-- Class chat, plus an optional focus check that uses the camera only when explicitly allowed.
+- Class chat, plus an optional focus check with a privacy-safe attention estimate that uses the camera only when explicitly allowed.
 - Light/dark theme, responsive layout and keyboard-friendly controls.
 
 ### Teacher
@@ -103,8 +103,8 @@ Each feedback record includes a headline, message, metrics, focus topics, streng
 ## 6. Privacy and the optional camera
 
 - No camera access happens by default. The browser asks for permission only when the student presses the start button on `/camera`.
-- The focus check detects **face presence and rough centring only**. It does not recognise identity, read emotions, estimate ability or store images or video.
-- Only aggregate counts are saved (session length, samples with a face, samples roughly centred).
+- The focus check detects **face presence, rough centring and head orientation only**. Its **attention estimate** is the share of sampled frames where the face was visible and roughly turned toward the camera. It does not recognise identity, read emotions, estimate ability or store images or video.
+- Only aggregate counts are saved (session length, samples with a face, samples roughly centred, attentive samples and the resulting attention estimate). The estimate is a proxy, not a judgement of real attention or understanding, and it never affects grades.
 - The app works fully without the camera; a manual check-in is offered as an alternative.
 - Student performance is visible to the student and to signed-in staff only. There is no public leaderboard or shareable performance page.
 - Passwords are stored only as hashes; sessions use signed JWT bearer tokens.
@@ -132,7 +132,7 @@ Each feedback record includes a headline, message, metrics, focus topics, streng
 | Database | MongoDB |
 | Optional camera check | MediaPipe Tasks Vision (loaded only on the focus page) |
 
-The frontend lives in `frontend/`, the API in `backend/`. `npm run build` writes the compiled app into `backend/static`, so Flask can serve the SPA and the API from one port.
+The frontend lives in `frontend/`, the API in `backend/`. `npm run build` writes the compiled app into `frontend/dist` (used by Vercel); `npm run build:backend` writes it into `backend/static`, so Flask can serve the SPA and the API from one port.
 
 ---
 
@@ -194,7 +194,7 @@ Open `http://localhost:5173`. Vite proxies API calls to the Flask server.
 ### 3. Single-server mode (production-style)
 ```powershell
 cd frontend
-npm run build
+npm run build:backend
 cd ..\backend
 python app.py
 ```

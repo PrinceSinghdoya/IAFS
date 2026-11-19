@@ -34,6 +34,8 @@ def ask_assistant():
             pass
 
     topic_slug = (data.get("topic_slug") or "").strip() or None
+    if topic_slug and topic_slug not in {topic["slug"] for topic in topics_for_class(class_level)}:
+        topic_slug = None
     reply = build_reply(message, class_level, topic_slug)
     reply["class_level"] = class_level
     return jsonify(reply)

@@ -151,7 +151,7 @@ function UserForm({ mode, initial, onClose, onSaved }) {
           >
             <option value="student">Student</option>
             <option value="teacher">Teacher</option>
-            <option value="admin">Administrator</option>
+            {mode === "edit" && <option value="admin">Administrator</option>}
           </select>
         </div>
         {mode === "create" && (

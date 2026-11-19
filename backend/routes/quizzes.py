@@ -196,7 +196,15 @@ def start_quiz():
         candidates = topics_for_class(class_level, subject or None)
         if not candidates:
             return jsonify({"error": "No topics available for this class"}), 404
-        topic = candidates[0]
+        # Prefer an unstarted topic; otherwise pick the weakest one.
+        progress = {row["slug"]: row for row in build_snapshot(g.user_id)["topics"]}
+        rows = [progress[topic["slug"]] for topic in candidates if topic["slug"] in progress]
+        unstarted = [row for row in rows if not row["attempts"]]
+        weakest = min(
+            unstarted or rows,
+            key=lambda row: row["average"] if row["average"] is not None else -1,
+        )
+        topic = TOPIC_BY_SLUG[weakest["slug"]]
 
     db = get_db()
     # Abandon old unfinished sessions so the dashboard stays clean.
@@ -290,20 +298,33 @@ def answer_question(session_id):
         "difficulty": current["difficulty"],
         "answered_at": datetime.now(timezone.utc),
     }
-    answers.append(answer)
     score = session["score"] + (1 if is_correct else 0)
     streak = session.get("streak", 0) + 1 if is_correct else 0
     max_streak = max(session.get("max_streak", 0), streak)
     next_level = next_difficulty(current["difficulty"], is_correct, streak)
 
-    session["answers"] = answers
-    session["score"] = score
-    session["streak"] = streak
-    session["max_streak"] = max_streak
-    session["difficulty"] = next_level
+    # Only one answer can be accepted for the current question. The $size
+    # condition makes concurrent submissions fail instead of overwriting each
+    # other.
+    claim = {
+        "_id": session_id,
+        "student_id": g.user_id,
+        "status": "active",
+        "answers": {"$size": len(answers)},
+    }
+    fields = {
+        "score": score,
+        "streak": streak,
+        "max_streak": max_streak,
+        "difficulty": next_level,
+    }
 
     total = session.get("total", QUESTIONS_PER_QUIZ)
-    if len(answers) >= total:
+    if len(answers) + 1 >= total:
+        if db.quiz_sessions.update_one(claim, {"$push": {"answers": answer}, "$set": fields}).modified_count == 0:
+            return jsonify({"error": "This answer was already submitted"}), 409
+        session["answers"].append(answer)
+        session.update(fields)
         result = _finalize_session(session)
         return jsonify(
             {
@@ -327,22 +348,18 @@ def answer_question(session_id):
     new_question = _unique_question(
         session["topic_slug"], session["class_level"], next_level, used
     )
-    session["questions"].append(new_question)
-    session["difficulty_path"].append(next_level)
-    db.quiz_sessions.update_one(
-        {"_id": session_id},
+    if db.quiz_sessions.update_one(
+        claim,
         {
-            "$set": {
-                "questions": session["questions"],
-                "answers": answers,
-                "score": score,
-                "streak": streak,
-                "max_streak": max_streak,
-                "difficulty": next_level,
-                "difficulty_path": session["difficulty_path"],
-            }
+            "$push": {
+                "answers": answer,
+                "questions": new_question,
+                "difficulty_path": next_level,
+            },
+            "$set": fields,
         },
-    )
+    ).modified_count == 0:
+        return jsonify({"error": "This answer was already submitted"}), 409
     return jsonify(
         {
             "correct": is_correct,
@@ -351,7 +368,7 @@ def answer_question(session_id):
             "explanation": current["explanation"],
             "simpler_example": current.get("simpler_example"),
             "score": score,
-            "answered": len(answers),
+            "answered": len(answers) + 1,
             "total": total,
             "percentage": round1((score / total) * 100),
             "difficulty": next_level,
@@ -372,6 +389,13 @@ def quiz_result(session_id):
         query["student_id"] = g.user_id
     session = db.quiz_sessions.find_one(query)
     if not session:
+        # Seeded demo results have no session document; review them directly.
+        result_query = {"session_id": session_id}
+        if g.user.get("role") == "student":
+            result_query["student_id"] = g.user_id
+        demo_result = db.learning_results.find_one(result_query)
+        if demo_result:
+            return jsonify({"result": _session_result_payload(demo_result)})
         return jsonify({"error": "Quiz session not found"}), 404
     if session.get("status") != "completed":
         return jsonify({"error": "Quiz is not finished yet"}), 409
@@ -393,7 +417,11 @@ def quiz_history():
         query["subject"] = subject
     if topic_slug:
         query["topic_slug"] = topic_slug
-    limit = min(int(request.args.get("limit", 30) or 30), 100)
+    try:
+        limit = int(request.args.get("limit", 30) or 30)
+    except (TypeError, ValueError):
+        limit = 30
+    limit = max(1, min(limit, 100))
     results = list(
         db.learning_results.find(query).sort("created_at", -1).limit(limit)
     )

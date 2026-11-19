@@ -45,7 +45,11 @@ def list_messages():
     Students only ever see their own class and whole-school notices.
     Teachers can filter by class_level; staff also see notices.
     """
-    limit = min(int(request.args.get("limit", 60) or 60), 100)
+    try:
+        limit = int(request.args.get("limit", 60) or 60)
+    except (TypeError, ValueError):
+        limit = 60
+    limit = max(1, min(limit, 100))
     query = {}
     if g.user.get("role") == "student":
         class_level = g.user.get("class_level")

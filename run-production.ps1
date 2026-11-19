@@ -11,7 +11,7 @@ if (-not (Test-Path "node_modules")) {
 }
 
 Write-Host "Building the React app into backend/static..." -ForegroundColor Cyan
-npm run build
+npm run build:backend
 if ($LASTEXITCODE -ne 0) {
     throw "Frontend build failed."
 }

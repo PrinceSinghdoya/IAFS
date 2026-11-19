@@ -8,6 +8,7 @@ The React frontend runs separately on http://localhost:5173 and calls
 http://127.0.0.1:5000/api.
 """
 import logging
+import os
 from pathlib import Path
 
 from flask import Flask, jsonify, send_from_directory
@@ -50,11 +51,14 @@ def create_app():
     # Create database indexes and auto-seed if needed (fails gracefully if Mongo is down).
     try:
         init_indexes()
-        if Config.AUTO_SEED:
+    except Exception as exc:  # pragma: no cover
+        app.logger.warning("Could not initialise MongoDB indexes: %s", exc)
+    if Config.AUTO_SEED:
+        try:
             from seed import auto_seed_if_empty
             auto_seed_if_empty(app.logger)
-    except Exception as exc:  # pragma: no cover
-        app.logger.warning("Could not initialise MongoDB: %s", exc)
+        except Exception as exc:  # pragma: no cover
+            app.logger.warning("Could not auto-seed MongoDB: %s", exc)
 
     # ------------------------------------------------------------------
     # Routes

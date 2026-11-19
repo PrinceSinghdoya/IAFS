@@ -96,6 +96,9 @@ def seed_users(db):
         }
         existing = db.users.find_one({"email": demo["email"]})
         if existing:
+            # Demo accounts always use the documented password, even after a
+            # password reset followed by a fresh seed.
+            profile["password_hash"] = hash_password(demo["password"])
             db.users.update_one({"_id": existing["_id"]}, {"$set": profile})
             continue
         profile.update(
@@ -228,20 +231,18 @@ def seed_results(db):
         if not user or not topic:
             continue
         student_id = str(user["_id"])
+        # A stable id keeps re-seeding idempotent even on a different calendar day.
+        session_id = f"demo-{student_id}-{topic_slug}-{days_ago}"
+        if db.learning_results.find_one({"session_id": session_id}):
+            continue
         created_at = datetime.now(timezone.utc) - timedelta(days=days_ago)
         created_at = created_at.replace(hour=hour, minute=15, second=0, microsecond=0)
-
-        # Avoid duplicating the same sample attempt on repeated seed runs.
-        if db.learning_results.find_one(
-            {"student_id": student_id, "topic_slug": topic_slug, "created_at": created_at}
-        ):
-            continue
 
         class_level = int(user.get("class_level") or 1)
         answers, path = _sample_answers(topic_slug, class_level, score)
         percentage = round(score / QUESTIONS_PER_QUIZ * 100, 1)
         result = {
-            "session_id": f"demo-{student_id}-{topic_slug}-{days_ago}",
+            "session_id": session_id,
             "student_id": student_id,
             "student_name": user["name"],
             "class_level": class_level,
@@ -302,11 +303,24 @@ def seed_focus(db):
         if not user:
             continue
         student_id = str(user["_id"])
-        created_at = datetime.now(timezone.utc) - timedelta(days=days_ago)
-        if db.focus_sessions.find_one({"student_id": student_id, "created_at": created_at}):
-            continue
+        demo_key = f"demo-{student_id}-{session_seconds}-{days_ago}"
         face = round(face_ratio * 100, 1)
         centered = round(centered_ratio * 100, 1)
+        # Demo records only have aggregate ratios, so use the conservative
+        # overlap as their attention estimate.
+        attention = round(min(face, centered), 1)
+        # Also matches records seeded by older versions (which had no demo_key).
+        if db.focus_sessions.find_one(
+            {
+                "student_id": student_id,
+                "is_demo": True,
+                "session_seconds": session_seconds,
+                "face_ratio": face,
+                "centered_ratio": centered,
+            }
+        ):
+            continue
+        created_at = datetime.now(timezone.utc) - timedelta(days=days_ago)
         score = round(face * 0.7 + centered * 0.3, 1)
         indicator = (
             "Face visible and centred"
@@ -324,13 +338,29 @@ def seed_focus(db):
                 "face_ratio": face,
                 "centered_ratio": centered,
                 "focus_score": score,
+                "attention_score": attention,
                 "indicator": indicator,
                 "source": "camera",
                 "is_demo": True,
+                "demo_key": demo_key,
                 "created_at": created_at,
             }
         )
         added += 1
+
+    # Older demo records predate the attention estimate; fill it in so every
+    # seeded focus check has the same fields without creating duplicates.
+    for record in db.focus_sessions.find(
+        {"is_demo": True, "attention_score": {"$exists": False}}
+    ):
+        face = record.get("face_ratio")
+        centered = record.get("centered_ratio", record.get("head_centered_ratio"))
+        if isinstance(face, (int, float)) and isinstance(centered, (int, float)):
+            db.focus_sessions.update_one(
+                {"_id": record["_id"]},
+                {"$set": {"attention_score": round(min(face, centered), 1)}},
+            )
+
     print(f"  [ok] demo focus checks ready ({added} new)")
 
 
@@ -387,10 +417,10 @@ def run_seed(db):
 
 
 def auto_seed_if_empty(logger=None):
-    """Auto-seed when database has no users yet (useful on fresh cloud deploys)."""
+    """Auto-seed a fresh database (useful on first cloud deploy)."""
     try:
         db = get_db()
-        if db.users.count_documents({}) == 0:
+        if db.users.count_documents({}) == 0 or db.topics.count_documents({}) == 0:
             if logger:
                 logger.info("Database has no users. Running initial seed...")
             run_seed(db)

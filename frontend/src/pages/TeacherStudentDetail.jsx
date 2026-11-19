@@ -308,20 +308,32 @@ export default function TeacherStudentDetail() {
                 No focus checks saved. They are optional and never affect grades.
               </p>
             ) : (
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg bg-surface-2 px-2 py-1.5">
-                  <p className="text-[9px] uppercase text-muted">Sessions</p>
-                  <p className="text-xs font-bold text-ink">{focus.sessions}</p>
+              <>
+                <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
+                  <div className="rounded-lg bg-surface-2 px-2 py-1.5">
+                    <p className="text-[9px] uppercase text-muted">Sessions</p>
+                    <p className="text-xs font-bold text-ink">{focus.sessions}</p>
+                  </div>
+                  <div className="rounded-lg bg-primary-50/70 px-2 py-1.5 dark:bg-primary-500/10">
+                    <p className="text-[9px] uppercase text-primary-700 dark:text-primary-200">
+                      Attention
+                    </p>
+                    <p className="text-xs font-bold text-ink">{percent(focus.attention)}</p>
+                  </div>
+                  <div className="rounded-lg bg-surface-2 px-2 py-1.5">
+                    <p className="text-[9px] uppercase text-muted">Face</p>
+                    <p className="text-xs font-bold text-ink">{percent(focus.face_visible)}</p>
+                  </div>
+                  <div className="rounded-lg bg-surface-2 px-2 py-1.5">
+                    <p className="text-[9px] uppercase text-muted">Centred</p>
+                    <p className="text-xs font-bold text-ink">{percent(focus.head_centered)}</p>
+                  </div>
                 </div>
-                <div className="rounded-lg bg-surface-2 px-2 py-1.5">
-                  <p className="text-[9px] uppercase text-muted">Face</p>
-                  <p className="text-xs font-bold text-ink">{percent(focus.face_visible)}</p>
-                </div>
-                <div className="rounded-lg bg-surface-2 px-2 py-1.5">
-                  <p className="text-[9px] uppercase text-muted">Centred</p>
-                  <p className="text-xs font-bold text-ink">{percent(focus.head_centered)}</p>
-                </div>
-              </div>
+                <p className="mt-2 text-[10px] leading-relaxed text-muted">
+                  Attention is an optional camera proxy, not a grade or a
+                  judgement of understanding.
+                </p>
+              </>
             )}
           </section>
 

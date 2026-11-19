@@ -193,6 +193,13 @@ def update_user(user_id):
         if role != "student" and "class_level" not in data:
             updates["class_level"] = None
             updates["level"] = None
+        elif role == "student" and "class_level" not in data:
+            # Staff accounts have no class; a student must always have one.
+            class_level = _class_level(target.get("class_level"))
+            if not class_level:
+                return jsonify({"error": "Choose a class from 1 to 10 for this student"}), 400
+            updates["class_level"] = class_level
+            updates["level"] = level_for_class(class_level)
     if "class_level" in data:
         class_level = _class_level(data.get("class_level"))
         effective_role = updates.get("role", target.get("role"))

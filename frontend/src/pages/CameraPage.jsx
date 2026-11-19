@@ -11,7 +11,6 @@ import {
   Save,
   ScanFace,
   ShieldCheck,
-  Sparkles,
   Video,
 } from "lucide-react";
 
@@ -19,7 +18,7 @@ import Alert from "../components/Alert";
 import { SectionLoader } from "../components/Loading";
 import { PageHeader } from "../components/ui";
 import { api } from "../lib/api";
-import { CATEGORY_STYLES } from "../lib/constants";
+import { isAttentiveFrame, measureAttention } from "../lib/attention";
 import { formatDate, secondsToClock } from "../lib/format";
 
 const MODEL_URL =
@@ -27,7 +26,7 @@ const MODEL_URL =
 const WASM_URL =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
 
-const EMPTY_STATS = { total: 0, face: 0, centered: 0 };
+const EMPTY_STATS = { total: 0, face: 0, centered: 0, attention: 0 };
 
 function indicatorFor(score) {
   if (score >= 75) return "Face visible and centred";
@@ -67,7 +66,6 @@ export default function CameraPage() {
   const [elapsed, setElapsed] = useState(0);
   const [saving, setSaving] = useState(false);
   const [savedRecord, setSavedRecord] = useState(null);
-  const [feedback, setFeedback] = useState(null);
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
 
@@ -81,10 +79,11 @@ export default function CameraPage() {
   const liveScore = Math.round(faceRatio * 0.7 + centeredRatio * 0.3);
   const liveIndicator =
     stats.total < 5 ? "Collecting signal" : indicatorFor(liveScore);
+  const attention = measureAttention(stats);
+  const liveAttention = stats.total < 5 ? "Collecting signal" : attention.indicator;
 
   function applySaved(data) {
     setSavedRecord(data.record);
-    if (data.feedback) setFeedback(data.feedback);
     setHistory((current) => [data.record, ...current].slice(0, 10));
   }
 
@@ -202,6 +201,7 @@ export default function CameraPage() {
             centered = Math.abs(nose.x - centerX) / (box.width / 2) < 0.35;
           }
           if (centered) next.centered += 1;
+          if (isAttentiveFrame(detection)) next.attention += 1;
           setFaceDetected(true);
           setHeadCentered(centered);
         } else {
@@ -219,7 +219,6 @@ export default function CameraPage() {
   async function startCamera() {
     setCameraError("");
     setSavedRecord(null);
-    setFeedback(null);
     setModelStatus("idle");
     setModelMessage("");
     startStats();
@@ -314,6 +313,7 @@ export default function CameraPage() {
         total_samples: sessionStats.total,
         face_detected_samples: sessionStats.face,
         head_centered_samples: sessionStats.centered,
+        attentive_samples: sessionStats.attention,
       });
       applySaved(data);
     } catch (err) {
@@ -352,7 +352,7 @@ export default function CameraPage() {
       <PageHeader
         eyebrow="Optional focus check"
         title="Optional focus check"
-        subtitle="A privacy-first, optional check. Your browser can tell whether a face is present and roughly centred. It never records, identifies or judges you."
+        subtitle="A privacy-first, optional check. Your browser estimates attention from whether a face is present and roughly turned toward the camera. It never records, identifies or judges you."
         actions={
           <span className="chip bg-amber-50 text-amber-800 dark:bg-amber-500/15 dark:text-amber-200">
             <ShieldCheck className="h-3.5 w-3.5" />
@@ -476,7 +476,7 @@ export default function CameraPage() {
                     {headCentered ? "Head roughly centred" : faceDetected ? "Head off-centre" : "Waiting for a face"}
                   </span>
                   <span className="chip bg-black/50 text-white backdrop-blur">
-                    {stats.total} frames analysed
+                    {stats.total} frames · {Math.round(attention.score)}% attention
                   </span>
                 </div>
 
@@ -489,7 +489,7 @@ export default function CameraPage() {
               </div>
 
               <div className="p-5">
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   <div className="rounded-xl bg-surface-2/60 p-3">
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
                       Face visible
@@ -504,6 +504,17 @@ export default function CameraPage() {
                     </p>
                     <p className="mt-1 text-xl font-bold text-ink">
                       {Math.round(centeredRatio)}%
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-primary-50/70 p-3 dark:bg-primary-500/10">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-primary-700 dark:text-primary-200">
+                      Attention estimate
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-ink">
+                      {Math.round(attention.score)}%
+                    </p>
+                    <p className="text-[10px] text-primary-700/80 dark:text-primary-200/80">
+                      {liveAttention}
                     </p>
                   </div>
                   <div className="rounded-xl bg-surface-2/60 p-3">
@@ -576,11 +587,24 @@ export default function CameraPage() {
                 <span className={`chip ${savedTone}`}>{savedRecord.indicator}</span>
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-4">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <div className="rounded-lg bg-surface-2/60 p-3">
                   <p className="text-[10px] uppercase text-muted">Signal score</p>
                   <p className="mt-0.5 text-lg font-bold text-ink">
                     {savedRecord.engagement_score}%
+                  </p>
+                </div>
+                <div className="rounded-lg bg-primary-50/70 p-3 dark:bg-primary-500/10">
+                  <p className="text-[10px] uppercase text-primary-700 dark:text-primary-200">
+                    Attention estimate
+                  </p>
+                  <p className="mt-0.5 text-lg font-bold text-ink">
+                    {savedRecord.attention_score != null
+                      ? `${savedRecord.attention_score}%`
+                      : "—"}
+                  </p>
+                  <p className="text-[9px] text-primary-700/80 dark:text-primary-200/80">
+                    {savedRecord.attention_indicator}
                   </p>
                 </div>
                 <div className="rounded-lg bg-surface-2/60 p-3">
@@ -605,23 +629,11 @@ export default function CameraPage() {
                 </div>
               </div>
 
-              {feedback && (
-                <div className={`mt-4 rounded-xl border p-3.5 ${CATEGORY_STYLES[feedback.category]?.soft || "bg-surface-2/60 border-line"}`}>
-                  <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-ink/75">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Adaptive feedback updated
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-ink">{feedback.headline}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-ink/75">{feedback.message}</p>
-                </div>
-              )}
-
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     setSavedRecord(null);
-                    setFeedback(null);
                     startCamera();
                   }}
                   className="btn-secondary py-2 text-xs"
@@ -646,7 +658,7 @@ export default function CameraPage() {
                 <h2 className="text-sm font-bold text-ink">Manual focus check-in</h2>
                 <p className="mt-0.5 text-xs leading-relaxed text-muted">
                   Prefer not to use the camera? Self-report a focused study session
-                  instead. It adds the same optional focus signal to your own feedback page.
+                  instead. It is an optional private record and never changes your quiz results.
                 </p>
               </div>
             </div>
@@ -656,7 +668,7 @@ export default function CameraPage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="focus" className="label">
-                  How focused were you? ({focusLevel}/5)
+                  How attentive did you feel? ({focusLevel}/5)
                 </label>
                 <input
                   id="focus"
@@ -670,7 +682,7 @@ export default function CameraPage() {
                 />
                 <div className="mt-1 flex justify-between text-[10px] text-muted">
                   <span>Distracted</span>
-                  <span>Very focused</span>
+                  <span>Very attentive</span>
                 </div>
               </div>
               <div>
@@ -727,13 +739,19 @@ export default function CameraPage() {
               </li>
               <li className="flex gap-2">
                 <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                A combined focus indicator from those two signals.
+                An attention estimate: the share of frames where the face was
+                visible and roughly facing the camera.
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                A combined focus indicator from the camera signals.
               </li>
             </ul>
             <div className="mt-3 rounded-lg bg-rose-50 p-3 text-[10px] leading-relaxed text-rose-700 dark:bg-rose-500/10 dark:text-rose-200">
               <span className="font-bold">Not measured:</span> emotions,
-              attention, boredom, identity or facial recognition. A still face can
-              simply mean deep concentration.
+              boredom, identity, facial recognition or real understanding. The
+              attention estimate is only a privacy-safe proxy from face position;
+              a still face can simply mean deep concentration.
             </div>
           </div>
 
@@ -752,9 +770,13 @@ export default function CameraPage() {
                   >
                     <div>
                       <p className="text-xs font-semibold text-ink">
-                        {record.engagement_score}% · {record.source === "camera" ? "Camera" : "Manual"}
+                        {record.attention_score != null
+                          ? `${record.attention_score}% attention`
+                          : "Attention —"}{" "}
+                        · {record.engagement_score}% focus
                       </p>
                       <p className="text-[10px] text-muted">
+                        {record.source === "camera" ? "Camera" : "Manual"} ·{" "}
                         {formatDate(record.created_at, { withTime: true })}
                       </p>
                     </div>
@@ -774,8 +796,9 @@ export default function CameraPage() {
             </p>
             <p className="mt-1.5 text-[10px] leading-relaxed text-muted">
               Video frames are never uploaded or saved. Only counts and
-              percentages are stored, linked to your student ID, so you can see
-              your own history.
+              percentages — including the attention estimate — are stored,
+              linked to your student ID, so you can see your own history. It is
+              never used for grades.
             </p>
           </div>
 

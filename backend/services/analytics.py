@@ -292,6 +292,37 @@ def score_distribution(class_level=None):
     return buckets
 
 
+def _is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _focus_average(records, key, fallback_key=None):
+    """Average only numeric values; manual checks store no camera ratios."""
+    values = []
+    for record in records:
+        value = record.get(key)
+        if value is None and fallback_key:
+            value = record.get(fallback_key)
+        if _is_number(value):
+            values.append(value)
+    return round1(mean(values)) if values else None
+
+
+def _attention_average(records):
+    """Average stored attention estimates, with a fallback for older records."""
+    values = []
+    for record in records:
+        value = record.get("attention_score")
+        if not _is_number(value):
+            face = record.get("face_ratio")
+            centered = record.get("centered_ratio", record.get("head_centered_ratio"))
+            candidates = [item for item in (face, centered) if _is_number(item)]
+            value = min(candidates) if candidates else None
+        if _is_number(value):
+            values.append(float(value))
+    return round1(mean(values)) if values else None
+
+
 def focus_summary(student_id):
     """Aggregate optional focus checks. Never used to grade a student."""
     records = list(
@@ -303,13 +334,15 @@ def focus_summary(student_id):
             "average_seconds": None,
             "face_visible": None,
             "head_centered": None,
+            "attention": None,
             "last_session": None,
         }
     return {
         "sessions": len(records),
-        "average_seconds": round1(mean(record.get("session_seconds", 0) for record in records)),
-        "face_visible": round1(mean(record.get("face_ratio", 0) for record in records)),
-        "head_centered": round1(mean(record.get("centered_ratio", 0) for record in records)),
+        "average_seconds": _focus_average(records, "session_seconds"),
+        "face_visible": _focus_average(records, "face_ratio"),
+        "head_centered": _focus_average(records, "centered_ratio", "head_centered_ratio"),
+        "attention": _attention_average(records),
         "last_session": records[0].get("created_at"),
     }
 

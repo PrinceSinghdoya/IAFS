@@ -594,6 +594,12 @@ def build_reply(message: str, class_level: int = 1, topic_slug: str | None = Non
         }
 
     detected = detect_topic(text, class_level, fallback=topic_slug)
+    # A primary-class student must never be shown secondary content (or the
+    # reverse), even if the question itself names another class's topic.
+    if detected:
+        topic = TOPIC_BY_SLUG.get(detected)
+        if not topic or topic["level"] != level_for_class(class_level):
+            detected = None
     if detected and detected in TOPIC_HINTS:
         return topic_explanation(detected, class_level, message)
 

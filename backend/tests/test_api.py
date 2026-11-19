@@ -13,6 +13,9 @@ import unittest
 # Must be set before importing config/db.
 os.environ["DB_NAME"] = "iafs_test"
 os.environ["JWT_SECRET"] = "iafs-test-secret-key-at-least-32-bytes-long"
+# The suite seeds its own structure/users; startup auto-seeding would add demo
+# quiz results and make clean-student assertions (e.g. topics_started) fail.
+os.environ["AUTO_SEED"] = "false"
 
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BACKEND_DIR)
@@ -309,6 +312,9 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(history.status_code, 200)
         self.assertGreaterEqual(len(history.get_json()["results"]), 1)
 
+        bad_limit = self.client.get("/api/quizzes/history?limit=abc", headers=self.auth(token))
+        self.assertEqual(bad_limit.status_code, 200, bad_limit.get_data(as_text=True))
+
     def test_student_cannot_read_another_students_result(self):
         aarav = self.login("aarav@iafs.school", "Student@123")
         priya = self.login("priya@iafs.school", "Student@123")
@@ -387,6 +393,15 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(greeting.get_json()["kind"], "greeting")
         self.assertIn("Class 4", greeting.get_json()["answer"])
 
+        # A primary student cannot get secondary content, even when requested.
+        secondary = self.client.post(
+            "/api/assistant/ask",
+            headers=self.auth(token),
+            json={"message": "Explain algebra step by step", "topic_slug": "algebra"},
+        )
+        self.assertEqual(secondary.status_code, 200, secondary.get_data(as_text=True))
+        self.assertNotEqual(secondary.get_json()["topic_slug"], "algebra")
+
         suggestions = self.client.get("/api/assistant/suggestions", headers=self.auth(token))
         self.assertEqual(suggestions.status_code, 200)
         self.assertTrue(suggestions.get_json()["prompts"])
@@ -407,6 +422,9 @@ class IAFSAPITestCase(unittest.TestCase):
         analysis = sent.get_json()["message"]["analysis"]
         self.assertEqual(analysis["learning_difficulty"], "Possible")
         self.assertEqual(analysis["topic_slug"], "fractions")
+
+        bad_limit = self.client.get("/api/chat/messages?limit=abc", headers=self.auth(aarav))
+        self.assertEqual(bad_limit.status_code, 200, bad_limit.get_data(as_text=True))
 
         class_four = self.client.get("/api/chat/messages", headers=self.auth(aarav))
         self.assertEqual(class_four.status_code, 200)
@@ -447,14 +465,18 @@ class IAFSAPITestCase(unittest.TestCase):
                 "total_samples": 100,
                 "face_detected_samples": 90,
                 "head_centered_samples": 70,
+                "attentive_samples": 80,
             },
         )
         self.assertEqual(response.status_code, 201, response.get_data(as_text=True))
         record = response.get_json()["record"]
         self.assertEqual(record["face_ratio"], 90.0)
         self.assertEqual(record["engagement_score"], 84.0)
+        self.assertEqual(record["attention_score"], 80.0)
+        self.assertEqual(record["attention_indicator"], "Strong attention signal")
         self.assertEqual(record["indicator"], "Face visible and centred")
         self.assertIn("never used to grade", response.get_json()["note"])
+        self.assertIn("attention estimate", response.get_json()["note"])
 
         invalid = self.client.post(
             "/api/engagement",
@@ -463,10 +485,30 @@ class IAFSAPITestCase(unittest.TestCase):
         )
         self.assertEqual(invalid.status_code, 400)
 
+        # Manual check-ins have no camera ratios; teacher reports must still work.
+        manual = self.client.post(
+            "/api/engagement",
+            headers=self.auth(token),
+            json={"source": "manual", "session_seconds": 45, "focus_level": 4},
+        )
+        self.assertEqual(manual.status_code, 201, manual.get_data(as_text=True))
+        self.assertIsNone(manual.get_json()["record"]["face_ratio"])
+        self.assertEqual(manual.get_json()["record"]["attention_score"], 80.0)
+
+        student_id = self.client.get("/api/auth/me", headers=self.auth(token)).get_json()["user"]["id"]
+        teacher = self.login("teacher@iafs.school", "Teacher@123")
+        detail = self.client.get(
+            f"/api/teacher/students/{student_id}", headers=self.auth(teacher)
+        )
+        self.assertEqual(detail.status_code, 200, detail.get_data(as_text=True))
+        self.assertEqual(detail.get_json()["focus"]["face_visible"], 90.0)
+        self.assertEqual(detail.get_json()["focus"]["attention"], 80.0)
+
         latest = self.client.get("/api/engagement/latest", headers=self.auth(token))
         self.assertEqual(latest.status_code, 200)
         self.assertIsNotNone(latest.get_json()["latest"])
         self.assertIn("No images", latest.get_json()["note"])
+        self.assertIn("attention estimate", latest.get_json()["note"])
 
     def test_sentiment_examples(self):
         negative = analyze_message("I am not understanding fractions.")
@@ -582,6 +624,33 @@ class IAFSAPITestCase(unittest.TestCase):
             json={"password": "newsecret123"},
         )
         self.assertEqual(reset.status_code, 200)
+
+        # Changing a staff account into a student requires a class level.
+        staff = self.client.post(
+            "/api/admin/users",
+            headers=self.auth(token),
+            json={
+                "name": "Former Teacher",
+                "email": "former.teacher@example.com",
+                "password": "secret123",
+                "role": "teacher",
+            },
+        )
+        self.assertEqual(staff.status_code, 201, staff.get_data(as_text=True))
+        staff_id = staff.get_json()["user"]["id"]
+        classless = self.client.patch(
+            f"/api/admin/users/{staff_id}", headers=self.auth(token), json={"role": "student"}
+        )
+        self.assertEqual(classless.status_code, 400)
+        promoted = self.client.patch(
+            f"/api/admin/users/{staff_id}",
+            headers=self.auth(token),
+            json={"role": "student", "class_level": 5},
+        )
+        self.assertEqual(promoted.status_code, 200, promoted.get_data(as_text=True))
+        student_token = self.login("former.teacher@example.com", "secret123")
+        dashboard = self.client.get("/api/student/dashboard", headers=self.auth(student_token))
+        self.assertEqual(dashboard.status_code, 200, dashboard.get_data(as_text=True))
 
 
 if __name__ == "__main__":

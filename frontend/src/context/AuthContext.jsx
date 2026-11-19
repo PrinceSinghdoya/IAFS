@@ -9,6 +9,8 @@ const USER_KEY = "iafs_user";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
+    // A saved user is only valid alongside its token.
+    if (!localStorage.getItem(TOKEN_KEY)) return null;
     try {
       return JSON.parse(localStorage.getItem(USER_KEY) || "null");
     } catch {
@@ -21,6 +23,8 @@ export function AuthProvider({ children }) {
   // Verify the saved token when the app loads.
   useEffect(() => {
     if (!token) {
+      localStorage.removeItem(USER_KEY);
+      setUser(null);
       setLoading(false);
       return;
     }

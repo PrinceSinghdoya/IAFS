@@ -66,7 +66,7 @@ def topic_rows_for_student(student_id, class_level=None):
     """One row per curriculum topic for the student's class + subject."""
     student = _student(student_id) if class_level is None else None
     if class_level is None:
-        class_level = (student or {}).get("class_level", 1)
+        class_level = (student or {}).get("class_level") or 1
     class_level = int(class_level)
     results = results_for_student(student_id)
     grouped = {}
@@ -188,7 +188,7 @@ def _recent_chat_signal(student_id):
 def build_snapshot(student_id, student=None):
     """Compute the complete evidence bundle for one student."""
     student = student or _student(student_id) or {}
-    class_level = int(student.get("class_level", 1))
+    class_level = int(student.get("class_level") or 1)
     results = results_for_student(student_id)
     attempts = len(results)
     percentages = [result.get("percentage", 0) for result in results]
