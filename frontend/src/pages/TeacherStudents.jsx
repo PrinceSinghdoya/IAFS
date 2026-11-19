@@ -7,6 +7,7 @@ import { SectionLoader } from "../components/Loading";
 import {
   Avatar,
   CategoryBadge,
+  DemoBadge,
   EmptyState,
   PageHeader,
   StatusBadge,
@@ -86,20 +87,21 @@ export default function TeacherStudents() {
           <option value="Mathematics">Mathematics</option>
         </select>
 
-        <form onSubmit={applySearch} className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name or email..."
-            className="input pl-9"
-          />
+        <form onSubmit={applySearch} className="flex flex-1 gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name or email..."
+              className="input pl-9"
+            />
+          </div>
+          <button type="submit" className="btn-secondary">
+            Apply
+          </button>
         </form>
-
-        <button type="submit" onClick={applySearch} className="btn-secondary">
-          Apply
-        </button>
       </div>
 
       {loading && !data ? (
@@ -136,7 +138,10 @@ export default function TeacherStudents() {
                         <div className="flex items-center gap-2.5">
                           <Avatar name={student.name} size="sm" />
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-ink">{student.name}</p>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <p className="truncate font-semibold text-ink">{student.name}</p>
+                              {student.is_demo && <DemoBadge label="Demo" />}
+                            </div>
                             <p className="truncate text-[10px] text-muted">{student.email}</p>
                           </div>
                         </div>

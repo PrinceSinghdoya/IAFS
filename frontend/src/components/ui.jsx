@@ -145,6 +145,17 @@ export function ClassBadge({ level, className = "" }) {
   );
 }
 
+export function DemoBadge({ className = "", label = "Demo data" }) {
+  return (
+    <span
+      className={`chip border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-200 ${className}`}
+      title="This record was created by the seed script for demonstration."
+    >
+      {label}
+    </span>
+  );
+}
+
 export function SectionHeading({ title, subtitle, action, icon: Icon }) {
   return (
     <div className="mb-3 flex flex-wrap items-end justify-between gap-2">

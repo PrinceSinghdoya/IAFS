@@ -93,6 +93,32 @@ def dashboard():
         },
         sort=[("created_at", -1)],
     )
+    recommendations = _recommendations(snapshot)
+    continue_learning = None
+    if recent_results:
+        latest = recent_results[0]
+        topic = TOPIC_BY_SLUG.get(latest.get("topic_slug") or "")
+        if topic and (latest.get("percentage") or 0) < 85:
+            continue_learning = {
+                "slug": topic["slug"],
+                "title": topic["title"],
+                "subject": topic["subject"],
+                "emoji": topic["emoji"],
+                "icon": topic["icon"],
+                "reason": f"Your last quiz scored {latest.get('percentage')}%. A short review will help.",
+                "action": "Practise again",
+                "last_result_id": latest.get("id"),
+                "last_percentage": latest.get("percentage"),
+                "last_attempt": latest.get("created_at"),
+            }
+    if continue_learning is None and recommendations:
+        item = recommendations[0]
+        continue_learning = {
+            **item,
+            "last_result_id": None,
+            "last_percentage": None,
+            "last_attempt": None,
+        }
 
     return jsonify(
         {
@@ -102,7 +128,8 @@ def dashboard():
             "summary": summary,
             "subjects": subjects,
             "recent_results": recent_results,
-            "recommendations": _recommendations(snapshot),
+            "recommendations": recommendations,
+            "continue_learning": continue_learning,
             "feedback": serialize_feedback(feedback),
             "streak_days": student_streak(g.user_id),
             "latest_message": json_safe(latest_message),

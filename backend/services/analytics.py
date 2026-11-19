@@ -5,6 +5,7 @@ from statistics import mean
 from curriculum import CLASS_LEVELS, SUBJECTS, TOPICS, TOPIC_BY_SLUG, level_for_class, topics_for_class
 from db import get_db
 from services.feedback_engine import (
+    CATEGORY_ORDER,
     build_snapshot,
     decide_category,
     learning_streak,
@@ -122,10 +123,29 @@ def teacher_student_rows(class_level=None, subject=None, search=None):
                 "focus_topic": focus_topic["title"] if focus_topic else None,
                 "focus_percentage": focus_topic["average"] if focus_topic else None,
                 "streak_days": snapshot["streak_days"],
+                "is_demo": bool(student.get("is_demo")),
             }
         )
     rows.sort(key=lambda row: (row["class_level"] or 0, row["name"] or ""))
     return rows
+
+
+def feedback_categories(rows=None):
+    """Count students in each feedback category from their real averages."""
+    rows = rows if rows is not None else teacher_student_rows()
+    counts = {category: 0 for category in CATEGORY_ORDER}
+    for row in rows:
+        category = row.get("category") or decide_category(row.get("average"))
+        counts[category] = counts.get(category, 0) + 1
+    total = sum(counts.values())
+    return [
+        {
+            "category": category,
+            "count": counts[category],
+            "percentage": round1(counts[category] * 100 / total) if total else 0,
+        }
+        for category in CATEGORY_ORDER
+    ]
 
 
 def class_performance():
@@ -245,6 +265,7 @@ def recent_activity(limit=8):
                 "detail": f"Score {result.get('score')}/{result.get('total')} ({result.get('percentage')}%)",
                 "created_at": result.get("created_at"),
                 "class_level": result.get("class_level"),
+                "is_demo": bool(result.get("is_demo")),
             }
         )
     for message in db.class_messages.find({}).sort("created_at", -1).limit(limit):
@@ -255,6 +276,7 @@ def recent_activity(limit=8):
                 "detail": (message.get("text") or "")[:110],
                 "created_at": message.get("created_at"),
                 "class_level": message.get("class_level"),
+                "is_demo": bool(message.get("is_demo")),
             }
         )
     for record in db.focus_sessions.find({}).sort("created_at", -1).limit(limit):
@@ -265,6 +287,7 @@ def recent_activity(limit=8):
                 "detail": f"{record.get('session_seconds', 0)} seconds, {record.get('indicator', 'Low signal')}",
                 "created_at": record.get("created_at"),
                 "class_level": record.get("class_level"),
+                "is_demo": bool(record.get("is_demo")),
             }
         )
     items.sort(key=lambda item: item.get("created_at") or datetime.min.replace(tzinfo=timezone.utc), reverse=True)

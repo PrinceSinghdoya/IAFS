@@ -23,6 +23,7 @@ import Alert from "../components/Alert";
 import { SectionLoader } from "../components/Loading";
 import {
   CategoryBadge,
+  DemoBadge,
   EmptyState,
   PageHeader,
   ProgressBar,
@@ -321,6 +322,7 @@ export default function Progress() {
                     </p>
                   </div>
                   <CategoryBadge category={result.category} />
+                  {result.is_demo && <DemoBadge label="Demo" />}
                 </Link>
               ))}
             </div>

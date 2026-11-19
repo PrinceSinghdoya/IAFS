@@ -10,7 +10,7 @@ import {
 
 import Alert from "../components/Alert";
 import { SectionLoader, Spinner } from "../components/Loading";
-import { EmptyState, PageHeader, SentimentPill } from "../components/ui";
+import { EmptyState, PageHeader, SentimentPill, DemoBadge } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { CLASS_LEVELS, classLevelLabel } from "../lib/constants";
@@ -229,6 +229,7 @@ export default function Chat() {
                             Teacher
                           </span>
                         )}
+                        {message.is_demo && <DemoBadge label="Demo" className="px-1.5 py-0 text-[9px]" />}
                         <span className="text-muted">{formatTime(message.created_at)}</span>
                       </div>
 

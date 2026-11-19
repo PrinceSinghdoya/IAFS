@@ -59,6 +59,7 @@ def serialize_result(result, include_answers=False):
         "category": result.get("category"),
         "suggestions": json_safe(result.get("suggestions", [])),
         "weak_topics": json_safe(result.get("weak_topics", [])),
+        "is_demo": bool(result.get("is_demo")),
         "created_at": json_safe(result.get("created_at")),
     }
     if include_answers:

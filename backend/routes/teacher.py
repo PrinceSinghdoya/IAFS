@@ -8,6 +8,7 @@ from curriculum import CLASS_LEVELS, SUBJECTS, level_for_class
 from db import get_db
 from services.analytics import (
     class_performance,
+    feedback_categories,
     focus_summary,
     recent_activity,
     score_distribution,
@@ -67,6 +68,7 @@ def teacher_dashboard():
             "classes": class_performance(),
             "subjects": subject_performance(),
             "weak_topics": weak_topics_overall(limit=6),
+            "feedback_categories": feedback_categories(students),
             "score_distribution": score_distribution(),
             "recent_activity": json_safe(recent_activity(limit=8)),
             "top_students": top_students,

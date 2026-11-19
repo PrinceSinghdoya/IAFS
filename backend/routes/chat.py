@@ -32,6 +32,7 @@ def serialize_message(message):
         "is_teacher": bool(message.get("is_teacher")),
         "text": message.get("text"),
         "analysis": json_safe(message.get("analysis")),
+        "is_demo": bool(message.get("is_demo")),
         "created_at": json_safe(message.get("created_at")),
     }
 

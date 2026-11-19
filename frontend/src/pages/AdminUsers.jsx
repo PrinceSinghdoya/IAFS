@@ -15,6 +15,7 @@ import Alert from "../components/Alert";
 import { SectionLoader, Spinner } from "../components/Loading";
 import {
   Avatar,
+  DemoBadge,
   EmptyState,
   PageHeader,
   SectionHeading,
@@ -467,7 +468,10 @@ export default function AdminUsers() {
                       <div className="flex items-center gap-2.5">
                         <Avatar name={user.name || "?"} size="sm" />
                         <div className="min-w-0">
-                          <p className="truncate font-semibold text-ink">{user.name}</p>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <p className="truncate font-semibold text-ink">{user.name}</p>
+                            {user.is_demo && <DemoBadge label="Demo" />}
+                          </div>
                           <p className="truncate text-[10px] text-muted">{user.email}</p>
                         </div>
                       </div>

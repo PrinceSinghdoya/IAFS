@@ -17,6 +17,7 @@ import FeedbackCard from "../components/FeedbackCard";
 import { SectionLoader } from "../components/Loading";
 import {
   CategoryBadge,
+  DemoBadge,
   EmptyState,
   PageHeader,
   ProgressBar,
@@ -38,7 +39,7 @@ export default function StudentDashboard() {
   if (error) return <Alert tone="error">{error}</Alert>;
   if (!data) return null;
 
-  const { summary, subjects, recent_results, recommendations, feedback, latest_message } = data;
+  const { summary, subjects, recent_results, recommendations, feedback, latest_message, continue_learning } = data;
   const firstName = (user?.name || data.user?.name || "Student").split(" ")[0];
 
   return (
@@ -92,6 +93,37 @@ export default function StudentDashboard() {
           helper="Days in a row with a completed quiz"
         />
       </div>
+
+      {continue_learning && (
+        <section className="card overflow-hidden border-primary-200/70 bg-gradient-to-br from-primary-50 via-surface to-accent-50/60 p-5 dark:border-primary-500/30 dark:from-primary-500/10 dark:via-surface dark:to-accent-500/10">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <span className="sticker bg-surface text-2xl">{continue_learning.emoji || "📘"}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-primary-700 dark:text-primary-300">
+                Continue learning
+              </p>
+              <p className="mt-0.5 text-lg font-extrabold tracking-tight text-ink">
+                {continue_learning.title}
+              </p>
+              <p className="text-xs leading-relaxed text-muted">
+                {continue_learning.subject} · {continue_learning.reason}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Link to={`/topics/${continue_learning.slug}`} className="btn-secondary py-2 text-xs">
+                Read lesson
+              </Link>
+              <Link
+                to={`/quiz/start?topic=${encodeURIComponent(continue_learning.slug)}`}
+                className="btn-primary py-2 text-xs"
+              >
+                <Play className="h-3.5 w-3.5" />
+                {continue_learning.action || "Practise"}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
@@ -242,6 +274,7 @@ export default function StudentDashboard() {
                       </p>
                     </div>
                     <CategoryBadge category={result.category} />
+                    {result.is_demo && <DemoBadge />}
                   </Link>
                 ))}
               </div>

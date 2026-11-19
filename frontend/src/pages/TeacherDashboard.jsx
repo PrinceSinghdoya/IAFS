@@ -26,6 +26,7 @@ import { SectionLoader } from "../components/Loading";
 import {
   Avatar,
   CategoryBadge,
+  DemoBadge,
   EmptyState,
   PageHeader,
   ProgressBar,
@@ -53,6 +54,7 @@ function StudentRow({ student }) {
           {student.attempts === 1 ? "" : "zes"}
         </p>
       </div>
+      {student.is_demo && <DemoBadge label="Demo" />}
       <span className="text-xs font-extrabold text-ink">{percent(student.average)}</span>
     </Link>
   );
@@ -66,7 +68,7 @@ export default function TeacherDashboard() {
   if (error) return <Alert tone="error">{error}</Alert>;
   if (!data) return null;
 
-  const { summary, classes, subjects, weak_topics, score_distribution, recent_activity, top_students, students_needing_support } = data;
+  const { summary, classes, subjects, weak_topics, feedback_categories, score_distribution, recent_activity, top_students, students_needing_support } = data;
   const classChart = classes.map((row) => ({
     name: `C${row.class_level}`,
     average: row.average ?? 0,
@@ -196,7 +198,7 @@ export default function TeacherDashboard() {
         </section>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         <section className="card p-5">
           <SectionHeading title="Subject performance" icon={BookOpen} />
           <div className="space-y-4">
@@ -259,6 +261,28 @@ export default function TeacherDashboard() {
             </div>
           )}
         </section>
+
+        <section className="card p-5">
+          <SectionHeading
+            title="Feedback mix"
+            subtitle="Students grouped by their current feedback category."
+          />
+          <div className="space-y-3">
+            {feedback_categories.map((row) => (
+              <div key={row.category}>
+                <div className="flex items-center justify-between gap-2">
+                  <CategoryBadge category={row.category} />
+                  <span className="text-xs font-bold text-ink">
+                    {row.count} <span className="font-medium text-muted">({row.percentage}%)</span>
+                  </span>
+                </div>
+                <div className="mt-1.5">
+                  <ProgressBar value={row.percentage} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -289,7 +313,10 @@ export default function TeacherDashboard() {
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
             {recent_activity.map((item, index) => (
               <div key={`${item.type}-${index}`} className="rounded-xl border border-line px-3 py-2">
-                <p className="text-[11px] font-semibold text-ink">{item.title}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-[11px] font-semibold text-ink">{item.title}</p>
+                  {item.is_demo && <DemoBadge label="Demo" />}
+                </div>
                 <p className="text-[10px] text-muted">{item.detail}</p>
                 <p className="mt-0.5 text-[9px] text-muted">
                   {classLevelLabel(item.class_level)} · {relativeTime(item.created_at)}

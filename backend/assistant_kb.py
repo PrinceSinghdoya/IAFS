@@ -181,6 +181,26 @@ TOPIC_HINTS = {
         ],
         "example": "A pizza in 4 equal slices with 1 slice eaten → 1/4 eaten.",
     },
+    "measurement": {
+        "remember": "Use the right unit: cm and m for length, g and kg for weight, mL and L for capacity.",
+        "steps": [
+            "Decide what you are measuring: length, weight or capacity.",
+            "Choose a unit that fits the object's size.",
+            "Remember 100 cm = 1 m, 1000 g = 1 kg and 1000 mL = 1 L.",
+            "To change a bigger unit to a smaller unit, multiply.",
+        ],
+        "example": "2 m = 2 × 100 = 200 cm, and 3 kg = 3 × 1000 = 3000 g.",
+    },
+    "time-and-money": {
+        "remember": "The short hand shows hours and the long hand shows minutes. Add money to find a total and subtract to find change.",
+        "steps": [
+            "Read the hour from the short hand.",
+            "Each number on the clock is 5 minutes for the long hand.",
+            "For elapsed time, count whole hours (60 minutes) then add the extra minutes.",
+            "For change, subtract the cost from the amount paid.",
+        ],
+        "example": "From 4:00 to 4:30 is 30 minutes. Change from ₹100 after spending ₹65 is ₹35.",
+    },
     # Secondary English
     "parts-of-speech": {
         "remember": "Ask what job the word is doing in the sentence.",
@@ -343,6 +363,17 @@ TOPIC_HINTS = {
         ],
         "example": "For 2, 4, 6: mean = 12 ÷ 3 = 4, median = 4, range = 4.",
     },
+    "mensuration": {
+        "remember": "Perimeter is the distance around, area is the surface inside and volume is the space inside a solid.",
+        "steps": [
+            "Identify the shape and the measurement the question asks for.",
+            "Use perimeter = 2(l + w) for a rectangle.",
+            "Use area = l × w for a rectangle and ½ × base × height for a triangle.",
+            "Use volume = l × w × h for a cuboid.",
+            "Write the correct unit: cm, cm² or cm³.",
+        ],
+        "example": "A 6 cm by 4 cm rectangle has perimeter 20 cm and area 24 cm².",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -355,6 +386,9 @@ KEYWORDS = [
     ("reading-comprehension-secondary", ["main idea", "inference", "comprehension", "passage", "summary"]),
     ("reading-comprehension", ["story", "read and answer", "comprehension"]),
     ("basic-writing-skills", ["paragraph", "letter writing", "essay", "topic sentence", "formal letter"]),
+    ("mensuration", ["mensuration", "volume", "cuboid", "surface area", "three dimensional"]),
+    ("measurement", ["measurement", "metre", "metres", "centimetre", "centimetres", "kilogram", "kilograms", "litre", "litres", "capacity"]),
+    ("time-and-money", ["money", "rupee", "rupees", "clock", "elapsed time", "change from"]),
     ("sentence-correction", ["correct the sentence", "sentence correction", "double negative", "grammar mistake"]),
     ("parts-of-speech", ["parts of speech", "noun", "pronoun", "adjective", "adverb", "verb"]),
     ("tenses", ["tense", "present perfect", "past continuous", "future tense", "past tense", "present tense"]),

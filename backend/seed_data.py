@@ -200,6 +200,14 @@ SAMPLE_ATTEMPTS = [
     ("nisha@iafs.school", "algebra", 7, 8, 10),
     ("nisha@iafs.school", "geometry", 6, 5, 11),
     ("nisha@iafs.school", "tenses", 8, 2, 9),
+    ("aarav@iafs.school", "measurement", 6, 5, 10),
+    ("aarav@iafs.school", "time-and-money", 4, 2, 14),
+    ("sara@iafs.school", "measurement", 7, 3, 9),
+    ("ishan@iafs.school", "time-and-money", 5, 1, 11),
+    ("rohan@iafs.school", "mensuration", 4, 3, 10),
+    ("priya@iafs.school", "mensuration", 6, 2, 9),
+    ("arjun@iafs.school", "mensuration", 5, 1, 12),
+    ("nisha@iafs.school", "mensuration", 7, 1, 10),
 ]
 
 # (email, role, class_level, text, minutes ago)

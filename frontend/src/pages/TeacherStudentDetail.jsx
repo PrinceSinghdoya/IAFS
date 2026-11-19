@@ -16,6 +16,7 @@ import { SectionLoader, Spinner } from "../components/Loading";
 import {
   Avatar,
   CategoryBadge,
+  DemoBadge,
   EmptyState,
   PageHeader,
   ProgressBar,
@@ -94,6 +95,7 @@ export default function TeacherStudentDetail() {
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               <CategoryBadge category={summary.category} />
+              {student.is_demo && <DemoBadge />}
               <span className={`chip bg-surface-2 ${trend.tone}`}>{trend.label}</span>
               <span className="chip bg-surface-2 text-muted">
                 Last activity: {summary.last_activity ? formatDate(summary.last_activity) : "None"}
@@ -200,6 +202,7 @@ export default function TeacherStudentDetail() {
                       </p>
                     </div>
                     <CategoryBadge category={result.category} />
+                    {result.is_demo && <DemoBadge label="Demo" />}
                   </Link>
                 ))}
               </div>

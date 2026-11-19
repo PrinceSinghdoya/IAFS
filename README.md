@@ -2,7 +2,7 @@
 
 IAFS is a full-stack learning platform for primary and secondary school English and Mathematics. Students read short, illustrated lessons, take adaptive multiple-choice quizzes, get feedback built from their real results, and ask a class-aware learning assistant for help. Teachers and administrators get live, database-backed dashboards for classes, students, topics and progress.
 
-The project is intentionally easy to explain: every score, category and recommendation can be traced to saved MongoDB records and readable Python rules. All demo data is fictional — no real children's information, photos or videos are stored.
+The project is intentionally easy to explain: every score, category and recommendation can be traced to saved MongoDB records and readable Python rules. All demo data is fictional — no real children's information, photos or videos are stored. Seeded records carry an `is_demo` flag and appear with a small **Demo** badge in the interface.
 
 ---
 
@@ -10,7 +10,7 @@ The project is intentionally easy to explain: every score, category and recommen
 
 ### Student
 - Register or sign in; choose a class from 1 to 10.
-- Dashboard with real averages, best score, topics started, streak, subject progress, recent results and the next recommended step.
+- Dashboard with real averages, best score, topics started, streak, subject progress, a **Continue learning** card, recent results and the next recommended step.
 - Browse **English** and **Mathematics** topics for the Primary (Classes 1–5) or Secondary (Classes 6–10) curriculum.
 - Every topic has an explanation, worked examples, key points, class-specific tips, illustrations, practice questions, answers and explanations.
 - Take an **adaptive quiz**: 8 MCQs, four options each, instant feedback after every answer, a simpler retry after mistakes and a harder question after success.
@@ -21,7 +21,7 @@ The project is intentionally easy to explain: every score, category and recommen
 - Light/dark theme, responsive layout and keyboard-friendly controls.
 
 ### Teacher
-- Overview of students, activity, averages, weak topics, score distribution and students needing support.
+- Overview of students, activity, averages, weak topics, feedback mix, score distribution and students needing support.
 - Filterable student list by class, subject and search term.
 - Individual student report: performance, subject/topic breakdown, strengths, focus topics, result history, feedback, focus checks, class messages and private teacher notes.
 - Class and subject performance pages.
@@ -30,19 +30,19 @@ The project is intentionally easy to explain: every score, category and recommen
 ### Administrator
 - School overview: account totals, active accounts, curriculum size, school average and weekly activity.
 - User directory: create accounts, correct names/roles/classes, reset passwords and deactivate access.
-- Classes and subjects catalogue with all 32 topics, level filters and search.
+- Classes and subjects catalogue with all 35 topics, level filters and search.
 - Full access to the teacher analytics pages.
 
 ---
 
 ## 2. Curriculum
 
-Two subjects, two levels, eight topics per subject and level — **32 topics** in total.
+Two subjects, two levels and **35 topics** in total: 8 Primary English, 10 Primary Mathematics, 8 Secondary English and 9 Secondary Mathematics.
 
 | Level | Classes | English | Mathematics |
 | --- | --- | --- | --- |
-| Primary | 1–5 | Alphabet Recognition, Basic Vocabulary, Naming Words, Articles, Simple Sentences, Basic Grammar, Reading Comprehension, Spelling Practice | Counting, Addition, Subtraction, Multiplication, Division, Number Patterns, Basic Shapes, Fractions |
-| Secondary | 6–10 | Parts of Speech, Tenses, Active and Passive Voice, Direct and Indirect Speech, Vocabulary Building, Sentence Correction, Reading Comprehension, Basic Writing Skills | Integers, Fractions and Decimals, Percentages, Ratio and Proportion, Algebra, Geometry, Linear Equations, Basic Statistics |
+| Primary | 1–5 | Alphabet Recognition, Basic Vocabulary, Naming Words, Articles, Simple Sentences, Basic Grammar, Reading Comprehension, Spelling Practice | Counting, Addition, Subtraction, Multiplication, Division, Number Patterns, Basic Shapes, Fractions, Measurement, Time and Money |
+| Secondary | 6–10 | Parts of Speech, Tenses, Active and Passive Voice, Direct and Indirect Speech, Vocabulary Building, Sentence Correction, Reading Comprehension, Basic Writing Skills | Integers, Fractions and Decimals, Percentages, Ratio and Proportion, Algebra, Geometry, Linear Equations, Basic Statistics, Mensuration |
 
 A student only sees topics for their own level. Quiz difficulty starts easier for younger classes and adapts from there.
 
@@ -144,7 +144,7 @@ iafs/
 │  ├─ app.py                 # Flask app factory, API registration, SPA serving
 │  ├─ config.py              # environment configuration
 │  ├─ db.py                  # MongoDB client and indexes
-│  ├─ curriculum.py          # subjects, 32 topics, question generator
+│  ├─ curriculum.py          # subjects, 35 topics, question generator
 │  ├─ seed.py / seed_data.py # demo accounts and fictional activity
 │  ├─ auth_utils.py          # hashing, JWT, role guards
 │  ├─ assistant_kb.py        # class-aware assistant knowledge base

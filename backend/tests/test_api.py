@@ -87,7 +87,7 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(health.get_json()["status"], "ok")
 
         meta = self.client.get("/api/meta").get_json()
-        self.assertEqual(meta["total_topics"], 32)
+        self.assertEqual(meta["total_topics"], 35)
         self.assertEqual(len(meta["classes"]), 10)
         self.assertEqual([subject["name"] for subject in meta["subjects"]], ["English", "Mathematics"])
         self.assertTrue(meta["demo_accounts"])
@@ -218,13 +218,14 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(body["class_level"], 4)
         self.assertEqual(body["level"], "Primary")
         self.assertEqual(len(body["subjects"]), 2)
-        self.assertTrue(all(subject["topics_total"] == 8 for subject in body["subjects"]))
+        topics_total = {subject["name"]: subject["topics_total"] for subject in body["subjects"]}
+        self.assertEqual(topics_total, {"English": 8, "Mathematics": 10})
         self.assertTrue(all(subject["topics_started"] == 0 for subject in body["subjects"]))
 
         topics = self.client.get("/api/topics?subject=Mathematics", headers=self.auth(token))
         self.assertEqual(topics.status_code, 200)
         rows = topics.get_json()["topics"]
-        self.assertEqual(len(rows), 8)
+        self.assertEqual(len(rows), 10)
         self.assertTrue(all("Fractions" in row["title"] or row["subject"] == "Mathematics" for row in rows))
 
         lesson = self.client.get("/api/topics/fractions", headers=self.auth(token))
@@ -242,11 +243,18 @@ class IAFSAPITestCase(unittest.TestCase):
         blocked = self.client.get("/api/topics/algebra", headers=self.auth(token))
         self.assertEqual(blocked.status_code, 403)
 
+        measurement = self.client.get("/api/topics/measurement", headers=self.auth(token))
+        self.assertEqual(measurement.status_code, 200, measurement.get_data(as_text=True))
+        self.assertEqual(measurement.get_json()["topic"]["title"], "Measurement")
+
+        mensuration = self.client.get("/api/topics/mensuration", headers=self.auth(token))
+        self.assertEqual(mensuration.status_code, 403)
+
         curriculum = self.client.get(
             "/api/curriculum", headers=self.auth(self.login("teacher@iafs.school", "Teacher@123"))
         )
         self.assertEqual(curriculum.status_code, 200)
-        self.assertEqual(curriculum.get_json()["total_topics"], 32)
+        self.assertEqual(curriculum.get_json()["total_topics"], 35)
 
     # ------------------------------------------------------------------
     # Adaptive quiz
@@ -366,6 +374,9 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertGreaterEqual(dashboard_body["summary"]["attempts"], 1)
         self.assertTrue(dashboard_body["recommendations"])
         self.assertTrue(dashboard_body["subjects"])
+        self.assertIn("continue_learning", dashboard_body)
+        self.assertTrue(dashboard_body["continue_learning"]["slug"])
+        self.assertIn("is_demo", dashboard_body["recent_results"][0])
 
         progress = self.client.get("/api/student/progress", headers=self.auth(token))
         self.assertEqual(progress.status_code, 200)
@@ -537,6 +548,11 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(len(body["subjects"]), 2)
         self.assertTrue(body["weak_topics"] is not None)
         self.assertEqual(len(body["score_distribution"]), 4)
+        self.assertEqual(len(body["feedback_categories"]), 5)
+        self.assertEqual(
+            sum(row["count"] for row in body["feedback_categories"]),
+            body["summary"]["students"],
+        )
 
         students = self.client.get("/api/teacher/students", headers=self.auth(token))
         self.assertEqual(students.status_code, 200)
@@ -581,7 +597,7 @@ class IAFSAPITestCase(unittest.TestCase):
         self.assertEqual(dashboard.status_code, 200, dashboard.get_data(as_text=True))
         body = dashboard.get_json()
         self.assertGreaterEqual(body["users"]["students"], 10)
-        self.assertEqual(body["content"]["topics"], 32)
+        self.assertEqual(body["content"]["topics"], 35)
         self.assertEqual(len(body["class_counts"]), 10)
         self.assertEqual(len(body["subjects"]), 2)
 
@@ -594,7 +610,7 @@ class IAFSAPITestCase(unittest.TestCase):
 
         structure = self.client.get("/api/admin/classes-subjects", headers=self.auth(token))
         self.assertEqual(structure.status_code, 200)
-        self.assertEqual(structure.get_json()["total_topics"], 32)
+        self.assertEqual(structure.get_json()["total_topics"], 35)
         self.assertEqual(len(structure.get_json()["classes"]), 10)
         self.assertEqual(len(structure.get_json()["subjects"]), 2)
 

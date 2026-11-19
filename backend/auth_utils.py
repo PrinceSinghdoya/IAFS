@@ -60,6 +60,7 @@ def public_user(user) -> dict:
         "roll_no": user.get("roll_no"),
         "subjects": user.get("subjects", []),
         "is_active": user.get("is_active", True),
+        "is_demo": bool(user.get("is_demo")),
         "created_at": user.get("created_at"),
     }
 

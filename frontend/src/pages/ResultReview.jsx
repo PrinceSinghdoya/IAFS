@@ -15,6 +15,7 @@ import { SectionLoader } from "../components/Loading";
 import ScoreRing from "../components/ScoreRing";
 import {
   CategoryBadge,
+  DemoBadge,
   DifficultyPill,
   PageHeader,
   SectionHeading,
@@ -100,7 +101,10 @@ export default function ResultReview() {
             <ScoreRing value={result.percentage} label="Score" />
           </div>
           <div>
-            <CategoryBadge category={result.category} />
+            <div className="flex flex-wrap items-center gap-2">
+              <CategoryBadge category={result.category} />
+              {result.is_demo && <DemoBadge />}
+            </div>
             <h2 className="mt-2 text-xl font-extrabold text-ink">
               {result.score} of {result.total} correct
             </h2>

@@ -627,6 +627,82 @@ TOPICS = [
             "5": "Find 1/3 of 12 objects.",
         },
     },
+    {
+        "slug": "measurement",
+        "title": "Measurement",
+        "subject": SUBJECT_MATHS,
+        "level": "Primary",
+        "classes": PRIMARY_CLASSES,
+        "icon": "Ruler",
+        "emoji": "📏",
+        "order": 9,
+        "description": "Measure length, weight and capacity using the right units.",
+        "explanation": (
+            "We measure things to find out how long, how heavy or how much they "
+            "are. Length is measured in centimetres (cm) and metres (m). Weight "
+            "is measured in grams (g) and kilograms (kg). Capacity, or how much "
+            "a container holds, is measured in millilitres (mL) and litres (L).\n\n"
+            "Choose the unit that fits the object: a pencil is about 15 cm, a "
+            "door is about 2 m, and a bottle of water may hold 1 L. 100 cm makes "
+            "1 m, 1000 g makes 1 kg, and 1000 mL makes 1 L."
+        ),
+        "examples": [
+            {"title": "Length", "body": "A pencil is about 15 cm long.", "emoji": "✏️"},
+            {"title": "Weight", "body": "A bag of rice may weigh 5 kg.", "emoji": "⚖️"},
+            {"title": "Capacity", "body": "A small bottle holds 500 mL.", "emoji": "🍶"},
+        ],
+        "key_points": [
+            "Length uses cm and m; 100 cm = 1 m.",
+            "Weight uses g and kg; 1000 g = 1 kg.",
+            "Capacity uses mL and L; 1000 mL = 1 L.",
+            "Pick the unit that matches the size of the object.",
+        ],
+        "class_tips": {
+            "1": "Use your hand spans to measure the table.",
+            "2": "Measure your pencil with a ruler and say the length in cm.",
+            "3": "Compare the weight of a book and a lunch box.",
+            "4": "Convert 3 m into centimetres.",
+            "5": "Find how many 250 mL cups fill a 1 L bottle.",
+        },
+    },
+    {
+        "slug": "time-and-money",
+        "title": "Time and Money",
+        "subject": SUBJECT_MATHS,
+        "level": "Primary",
+        "classes": PRIMARY_CLASSES,
+        "icon": "Clock3",
+        "emoji": "🕒",
+        "order": 10,
+        "description": "Read clocks, work out elapsed time and handle money.",
+        "explanation": (
+            "A clock has two hands. The short hand shows the hour and the long "
+            "hand shows the minutes. The minute hand moves 5 minutes for each "
+            "number on the clock face, so 12 means 0 minutes, 3 means 15 minutes "
+            "and 6 means 30 minutes.\n\n"
+            "Money helps us buy things. We add coins and notes to find a total, "
+            "and subtract to find change. If an item costs ₹40 and you pay ₹100, "
+            "your change is ₹60."
+        ),
+        "examples": [
+            {"title": "Telling time", "body": "Short hand on 3, long hand on 12 → 3 o'clock", "emoji": "🕒"},
+            {"title": "Elapsed time", "body": "From 4:00 to 4:30 is 30 minutes", "emoji": "⏳"},
+            {"title": "Money", "body": "₹25 + ₹30 = ₹55", "emoji": "💰"},
+        ],
+        "key_points": [
+            "The short hand shows hours; the long hand shows minutes.",
+            "Each number on the clock is 5 minutes.",
+            "Add money to find the total; subtract to find change.",
+            "60 minutes make 1 hour.",
+        ],
+        "class_tips": {
+            "1": "Say the time when the short hand points to 3.",
+            "2": "Show 6 o'clock on a paper clock.",
+            "3": "Count the minutes from 2:00 to 2:30.",
+            "4": "Add ₹35 and ₹48.",
+            "5": "Find the change from ₹100 after spending ₹65.",
+        },
+    },
     # ------------------------------------------------------------------ Secondary English
     {
         "slug": "parts-of-speech",
@@ -1189,6 +1265,46 @@ TOPICS = [
             "10": "Calculate a missing value from a given mean.",
         },
     },
+    {
+        "slug": "mensuration",
+        "title": "Mensuration",
+        "subject": SUBJECT_MATHS,
+        "level": "Secondary",
+        "classes": SECONDARY_CLASSES,
+        "icon": "Box",
+        "emoji": "📦",
+        "order": 9,
+        "description": "Find perimeter, area and volume of common shapes.",
+        "explanation": (
+            "Mensuration is the mathematics of measuring shapes. Perimeter is "
+            "the distance around a shape. Area is the amount of surface it "
+            "covers, measured in square units. Volume is the space inside a "
+            "solid, measured in cubic units.\n\n"
+            "Useful formulas: perimeter of a rectangle = 2(l + w); area of a "
+            "rectangle = l × w; area of a triangle = ½ × base × height; volume "
+            "of a cuboid = l × w × h. Always write the correct unit with your "
+            "answer, such as cm, cm² or cm³."
+        ),
+        "examples": [
+            {"title": "Perimeter", "body": "Rectangle 6 cm by 4 cm → 2(6 + 4) = 20 cm", "emoji": "📐"},
+            {"title": "Area", "body": "Triangle base 8 cm, height 5 cm → ½ × 8 × 5 = 20 cm²", "emoji": "🔺"},
+            {"title": "Volume", "body": "Cuboid 3 cm × 4 cm × 5 cm → 60 cm³", "emoji": "📦"},
+        ],
+        "key_points": [
+            "Perimeter is the distance around the outside.",
+            "Area of a rectangle = length × width.",
+            "Area of a triangle = ½ × base × height.",
+            "Volume of a cuboid = length × width × height.",
+            "Use cm² for area and cm³ for volume.",
+        ],
+        "class_tips": {
+            "6": "Find the perimeter of a rectangle 7 cm by 3 cm.",
+            "7": "Find the area of a square with side 6 cm.",
+            "8": "Find the area of a triangle with base 10 cm and height 4 cm.",
+            "9": "Find the volume of a cuboid 5 cm × 3 cm × 2 cm.",
+            "10": "Find the cost of painting a wall using its area.",
+        },
+    },
 ]
 
 
@@ -1517,6 +1633,142 @@ def _q_fractions(c, d):
     return _make("fractions", d, question, options, index, explanation, simpler)
 
 
+def _q_measurement(c, d):
+    if d == "easy":
+        items = [
+            ("pencil", "cm", ["kg", "L", "minutes"]),
+            ("school bag", "kg", ["cm", "mL", "hours"]),
+            ("water bottle", "L", ["cm", "g", "days"]),
+            ("classroom door", "m", ["g", "mL", "seconds"]),
+        ]
+        item, correct, distractors = random.choice(items)
+        question = f"Which unit is best for measuring a {item}?"
+        explanation = f"A {item} is measured in {correct}."
+        simpler = "Length uses cm or m, weight uses g or kg, and capacity uses mL or L."
+        options, index = _shuffle_with_correct(correct, distractors)
+        return _make("measurement", d, question, options, index, explanation, simpler)
+    if d == "medium":
+        big, small, factor = random.choice([("m", "cm", 100), ("kg", "g", 1000), ("L", "mL", 1000)])
+        amount = random.randint(2, 9)
+        answer = amount * factor
+        question = f"How many {small} are in {amount} {big}?"
+        explanation = f"1 {big} = {factor} {small}, so {amount} × {factor} = {answer} {small}."
+        simpler = f"Multiply by {factor} to change {big} into {small}."
+        options, index = _numeric_options(answer, low=0)
+        return _make("measurement", d, question, options, index, explanation, simpler)
+    item, big, small, factor = random.choice(
+        [("rope", "m", "cm", 100), ("bag of rice", "kg", "g", 1000), ("jug of juice", "L", "mL", 1000)]
+    )
+    whole = random.randint(1, 4)
+    extra = random.choice([10, 20, 25, 40, 50])
+    answer = whole * factor + extra
+    question = f"A {item} measures {whole} {big} {extra} {small}. How many {small} is that in total?"
+    explanation = (
+        f"{whole} {big} = {whole * factor} {small}. Add {extra} {small}: "
+        f"{whole * factor} + {extra} = {answer} {small}."
+    )
+    simpler = f"Change the {big} into {small} first, then add the extra {small}."
+    options, index = _numeric_options(answer, low=0)
+    return _make("measurement", d, question, options, index, explanation, simpler)
+
+
+def _clock(hour, minutes):
+    hour = hour % 12 or 12
+    return f"{hour}:{minutes:02d}"
+
+
+def _q_time_money(c, d):
+    if d == "easy":
+        if random.random() < 0.5:
+            hour = random.randint(1, 11)
+            correct = f"{hour} o'clock"
+            distractors = [f"{hour % 12 + 1} o'clock", f"{hour}:30", f"{hour - 1 if hour > 1 else 12} o'clock"]
+            question = (
+                f"The short hand points to {hour} and the long hand points to 12. "
+                "What time is it?"
+            )
+            explanation = f"The long hand on 12 means o'clock, so the time is {correct}."
+            simpler = "The short hand tells the hour and the long hand on 12 means o'clock."
+            options, index = _shuffle_with_correct(correct, distractors)
+            return _make("time-and-money", d, question, options, index, explanation, simpler)
+        a = random.choice([5, 10, 20, 25, 50])
+        b = random.choice([5, 10, 20, 25, 50])
+        answer = a + b
+        question = f"You have ₹{a} and ₹{b}. How much money do you have in total?"
+        explanation = f"Add the amounts: ₹{a} + ₹{b} = ₹{answer}."
+        simpler = "Add the rupees together to find the total."
+        options, index = _numeric_options(answer, low=0)
+        return _make("time-and-money", d, question, options, index, explanation, simpler)
+    if d == "medium":
+        if random.random() < 0.5:
+            hour = random.randint(1, 10)
+            duration = random.choice([15, 30, 45, 60])
+            end_minutes = duration % 60
+            correct = _clock(hour + duration // 60, end_minutes)
+            candidates = [
+                _clock(hour, (duration + 15) % 60),
+                _clock(hour + 1, end_minutes),
+                _clock(hour + 2, (end_minutes + 15) % 60),
+                _clock(hour, 0),
+            ]
+            distractors = []
+            for value in candidates:
+                if value != correct and value not in distractors:
+                    distractors.append(value)
+                if len(distractors) == 3:
+                    break
+            question = (
+                f"A lesson starts at {_clock(hour, 0)} and lasts {duration} minutes. "
+                "What time does it end?"
+            )
+            explanation = f"Add {duration} minutes to {_clock(hour, 0)}. The lesson ends at {correct}."
+            simpler = "30 minutes is half an hour and 60 minutes is one whole hour."
+            options, index = _shuffle_with_correct(correct, distractors)
+            return _make("time-and-money", d, question, options, index, explanation, simpler)
+        cost = random.choice([25, 35, 40, 45, 55, 65])
+        paid = random.choice([100, 100, 200])
+        answer = paid - cost
+        question = f"An item costs ₹{cost}. You pay with ₹{paid}. How much change do you get?"
+        explanation = f"Change = amount paid − cost = ₹{paid} − ₹{cost} = ₹{answer}."
+        simpler = "Subtract the cost from the money you paid."
+        options, index = _numeric_options(answer, low=0)
+        return _make("time-and-money", d, question, options, index, explanation, simpler)
+    if random.random() < 0.5:
+        start_hour = random.randint(1, 8)
+        start_minutes = random.choice([0, 15, 30])
+        end_hour = start_hour + random.randint(1, 3)
+        end_minutes = random.choice([0, 15, 30, 45])
+        start_total = start_hour * 60 + start_minutes
+        end_total = end_hour * 60 + end_minutes
+        answer = end_total - start_total
+        question = (
+            f"A film starts at {_clock(start_hour, start_minutes)} and ends at "
+            f"{_clock(end_hour, end_minutes)}. How many minutes long is the film?"
+        )
+        explanation = (
+            f"From {_clock(start_hour, start_minutes)} to {_clock(end_hour, end_minutes)} "
+            f"is {answer} minutes."
+        )
+        simpler = "Count the whole hours first (60 minutes each), then add the extra minutes."
+        options, index = _numeric_options(answer, low=0)
+        return _make("time-and-money", d, question, options, index, explanation, simpler)
+    notebook = random.choice([25, 30, 35, 40])
+    pen = random.choice([10, 15, 18, 20])
+    count = random.choice([2, 3])
+    answer = notebook * count + pen
+    question = (
+        f"A notebook costs ₹{notebook} and a pen costs ₹{pen}. "
+        f"How much do {count} notebooks and 1 pen cost in total?"
+    )
+    explanation = (
+        f"{count} notebooks cost {count} × ₹{notebook} = ₹{notebook * count}. "
+        f"Add the pen: ₹{notebook * count} + ₹{pen} = ₹{answer}."
+    )
+    simpler = "Find the cost of the notebooks first, then add the pen."
+    options, index = _numeric_options(answer, low=0)
+    return _make("time-and-money", d, question, options, index, explanation, simpler)
+
+
 # ---------------------------------------------------------------------------
 # Secondary Mathematics generators
 # ---------------------------------------------------------------------------
@@ -1743,6 +1995,47 @@ def _q_statistics(c, d):
         simpler = "Range tells how spread out the data is."
     options, index = _shuffle_with_correct(correct, distractors)
     return _make("basic-statistics", d, question, options, index, explanation, simpler)
+
+
+def _q_mensuration(c, d):
+    if d == "easy":
+        length = random.randint(3, 15)
+        width = random.randint(2, 12)
+        answer = 2 * (length + width)
+        question = f"A rectangle is {length} cm long and {width} cm wide. What is its perimeter?"
+        explanation = f"Perimeter = 2 × (length + width) = 2 × ({length} + {width}) = {answer} cm."
+        simpler = "Perimeter is the distance all the way around the shape."
+        options, index = _numeric_options(answer, low=0)
+        return _make("mensuration", d, question, options, index, explanation, simpler)
+    if d == "medium":
+        if random.random() < 0.5:
+            length = random.randint(4, 15)
+            width = random.randint(3, 12)
+            answer = length * width
+            question = f"A rectangle is {length} cm long and {width} cm wide. What is its area?"
+            explanation = f"Area = length × width = {length} × {width} = {answer} cm²."
+            simpler = "Area is the number of unit squares that fit inside the shape."
+        else:
+            base = random.choice([4, 6, 8, 10, 12])
+            height = random.randint(3, 9)
+            answer = (base * height) // 2
+            question = f"A triangle has a base of {base} cm and a height of {height} cm. What is its area?"
+            explanation = f"Area = ½ × base × height = ½ × {base} × {height} = {answer} cm²."
+            simpler = "Multiply base by height, then divide by 2."
+        options, index = _numeric_options(answer, low=0)
+        return _make("mensuration", d, question, options, index, explanation, simpler)
+    length = random.randint(3, 9)
+    width = random.randint(2, 7)
+    height = random.randint(2, 6)
+    answer = length * width * height
+    question = (
+        f"A cuboid is {length} cm long, {width} cm wide and {height} cm high. "
+        "What is its volume?"
+    )
+    explanation = f"Volume = length × width × height = {length} × {width} × {height} = {answer} cm³."
+    simpler = "Volume is the space inside a solid. Multiply the three dimensions."
+    options, index = _numeric_options(answer, low=0)
+    return _make("mensuration", d, question, options, index, explanation, simpler)
 
 
 # ---------------------------------------------------------------------------
@@ -2220,6 +2513,8 @@ GENERATORS = {
     "number-patterns": _q_number_patterns,
     "basic-shapes": _q_shapes,
     "fractions": _q_fractions,
+    "measurement": _q_measurement,
+    "time-and-money": _q_time_money,
     "integers": _q_integers,
     "fractions-decimals": _q_fractions_decimals,
     "percentages": _q_percentages,
@@ -2228,6 +2523,7 @@ GENERATORS = {
     "geometry": _q_geometry,
     "linear-equations": _q_linear_equations,
     "basic-statistics": _q_statistics,
+    "mensuration": _q_mensuration,
     "alphabet-recognition": _q_alphabet,
     "basic-vocabulary": _q_vocabulary,
     "naming-words": _q_naming_words,
